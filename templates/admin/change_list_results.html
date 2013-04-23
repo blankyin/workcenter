@@ -1,0 +1,139 @@
+{% load i18n admin_static %}
+{% if result_hidden_fields %}
+    <div class="hiddenfields">{# DIV for HTML validation #}
+        {% for item in result_hidden_fields %}{{ item }}{% endfor %}
+    </div>
+{% endif %}
+{% if results %}
+    <div class="results">
+
+        <div id="opt">
+            <div id="query">
+                <label>编号：</label><input type="text" class="input" id="sn" />
+                <label>名称：</label><input type="text" class="input" id="title" />
+                <input type="submit" class="btn" id="find_btn" value="查 询" />
+            </div>
+            <input type="button" class="btn" id="add_btn" value="新 增" />
+            <input type="button" class="btn" id="del_btn" value="删 除" />
+        </div>
+
+        <table id="gridTable"></table>
+        <div id="gridPager"></div>
+
+        <table id="result_list">
+            <thead>
+            <tr>
+                {% for header in result_headers %}
+                    <th scope="col" {{ header.class_attrib }}>
+                        {% if header.sortable %}
+                            {% if header.sort_priority > 0 %}
+                                <div class="sortoptions">
+                                    <a class="sortremove" href="{{ header.url_remove }}"
+                                       title="{% trans "Remove from sorting" %}"></a>
+                                    {% if num_sorted_fields > 1 %}<span class="sortpriority"
+                                                                        title="{% blocktrans with priority_number=header.sort_priority %}Sorting priority: {{ priority_number }}{% endblocktrans %}">
+                                        {{ header.sort_priority }}</span>{% endif %}
+                                    <a href="{{ header.url_toggle }}"
+                                       class="toggle {% if header.ascending %}ascending{% else %}descending{% endif %}"
+                                       title="{% trans "Toggle sorting" %}"></a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <div class="text">{% if header.sortable %}<a href="{{ header.url_primary }}">
+                            {{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}
+                        </div>
+                        <div class="clear"></div>
+                    </th>{% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in results %}
+                {% if result.form.non_field_errors %}
+                    <tr>
+                        <td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td>
+                    </tr>
+                {% endif %}
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    {% for item in result %}{{ item }}{% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+
+<script type="text/javascript">
+    $("#gridTable").jqGrid({
+        mtype: "GET",
+        url: "/admin/workcenter/foo_list",
+        datatype: "json",
+        height: 250,
+        width:800,
+        colNames:['编号','名称'],
+        colModel:[
+            {name:'id',index:'id', width:260, sorttype:"int"},
+            {name:'name',index:'name', width:290}
+        ],
+        sortname:'id',
+        sortorder:'asc',
+        viewrecords:true,
+        rowNum:10,
+        rowList:[10,20,30],
+        pager:"#gridPager",
+        caption: "第一个jqGrid例子",
+
+    }).navGrid('#pager2',{edit:true,add:true,del:true});
+
+    $(function(){
+        $("#add_btn").click(function(){
+            $.fancybox({
+                'type':'ajax',
+                'href':'/admin/workcenter/add_foo/'
+            });
+        });
+        $("#del_btn").click(function(){
+            var sels = $("#gridTable").jqGrid('getGridParam','selarrrow');
+            if(sels==""){
+                alert('请选择要删除的项！')
+            }else{
+                if(confirm("您是否确认删除？")){
+                    $.ajax({
+                        type: "POST",
+                        url: "do.php?action=del",
+                        data: "ids="+sels,
+                        beforeSend: function() {
+                            $().message("正在请求...");
+                        },
+                        error:function(){
+                            $().message("请求失败...");
+                        },
+                        success: function(msg){
+                            if(msg!=0){
+                                var arr = msg.split(',');
+                                $.each(arr,function(i,n){
+                                    if(arr[i]!=""){
+                                        $("#list").jqGrid('delRowData',n);
+                                    }
+                                });
+                                $().message("已成功删除!");
+                            }else{
+                                $().message("操作失败！");
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#find_btn").click(function(){
+            var title = escape($("#title").val());
+            var sn = escape($("#sn").val());
+            $("#list").jqGrid('setGridParam',{
+                url:"do.php?action=list",
+                postData:{'title':title,'sn':sn},
+                page:1
+            }).trigger("reloadGrid");
+        });
+    });
+</script>

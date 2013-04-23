@@ -1,0 +1,54 @@
+{% extends "admin/base_pop.html" %}
+{% load workcenter_tags %}
+
+{% block content %}
+
+    <div class="fanbox">
+        <h3>需求详情</h3>
+            <div class="field">
+                <label for="id_status">{{ labels | key:"status" }}:</label>
+                {{ requirement.status }}
+                <br>
+
+                <label for="id_requirement_name">{{ labels | key:"requirement_name" }}: </label>
+                {{ requirement.requirement_name }}
+                <br>
+
+                <label for="id_requirement_type">{{ labels | key:"requirement_type" }}: </label>
+                {{ requirement.requirement_type }}
+                <br>
+
+                <label for="id_requirement_dept">{{ labels | key:"requirement_dept" }}:</label>
+                {{ requirement.requirement_dept }}
+                <br>
+
+                <label for="id_gmt_hope_finished">{{ labels | key:"gmt_hope_finished" }}:</label>
+                {{ requirement.gmt_hope_finished | date:"Y-m-d" }}
+                <br>
+
+                <label for="id_submitter_user">{{ labels | key:"submitter_user" }}: </label>
+                {{ requirement.submitter_user }}
+                <br>
+
+                <label for="id_gmt_submit">{{ labels | key:"gmt_submit" }}:</label>
+                {{ requirement.gmt_submit | default_if_none:"" | date:"Y-m-d H:m:s" }}
+                <br>
+
+                <label for="id_requirement_desc">{{ labels | key:"requirement_desc" }}:</label>
+                {{ requirement.requirement_desc }}
+                <br>
+
+                <label for="id_modifier_user">{{ labels | key:"modifier_user" }}:</label>
+                {{ requirement.modifier_user | default_if_none:"" }}
+                <br>
+
+                <label for="id_gmt_modified">{{ labels | key:"gmt_modified" }}:</label>
+                {{ requirement.gmt_modified | default_if_none:"" | date:"Y-m-d H:m:s"  }}
+                <br>
+
+            </div>
+
+            <input type="button" class="btn" value="关闭" onclick="parent.jQuery.fancybox.close();"  />
+    </div>
+
+{% endblock %}

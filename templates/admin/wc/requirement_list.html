@@ -1,0 +1,168 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_list %}
+{% load admin_urls %}
+{% load workcenter_tags %}
+
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}"/>
+    {% if cl.formset %}
+        <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
+    {% endif %}
+    {% if cl.formset or action_form %}
+        <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+    {% endif %}
+    {{ media.css }}
+    {% if not actions_on_top and not actions_on_bottom %}
+        <style>
+            #changelist table thead th:first-child {
+                width: inherit
+            }
+        </style>
+    {% endif %}
+
+    <script src="{% static "admin/js/wc/requirement.js" %}" type="text/javascript"></script>
+
+    {# 由于需要读取变量值，未放入requirement.js中 #}
+    <script>
+        $(document).ready(function () {
+            $("#requirementTable").jqGrid({
+                mtype: "POST",
+                url: "/admin/workcenter/requirement_list/",
+                datatype: "json",
+                height: 250,
+        //        width: 'auto',
+                autowidth:true,
+                rownumbers:true,
+                colNames: ['操作', '需求状态', '需求单号', '需求名称', '需求类别', '需求部门', '需求描述'
+                    , '期望完成日期', '需求提出人', '需求提出时间'],
+                colModel: [
+                    {name: 'id', index: 'id', width: 100, frozen:true,
+                        formatter:function (cellvalue, options, rowObject){
+                            opration = '<a onclick="requirement_detail(' + cellvalue + ')">详情</a>'
+                            return opration
+                        }
+                    },
+                    {name: 'status', index: 'status', width: 100, frozen:true },
+                    {name: 'requirement_code', index: 'requirement_code', width: 100},
+                    {name: 'requirement_name', index: 'requirement_name', width: 100},
+                    {name: 'requirement_type_name', index: 'requirement_type', width: 100},
+                    {name: 'requirement_dept_name', index: 'requirement_dept', width: 100},
+                    {name: 'requirement_desc', index: 'requirement_desc', width: 100},
+                    {name: 'gmt_hope_finished', index: 'gmt_hope_finished', width: 150,
+                        formatter:"date",formatoptions: {srcformat:'Y-m-d H:i:s',newformat:'Y-m-d'}},
+                    {name: 'submitter_user_name', index: 'submitter_user_name', width: 100},
+                    {name: 'gmt_submit', index: 'gmt_submit', width: 150}
+
+                ],
+                sortname: 'gmt_submit',
+                sortorder: 'desc',
+                viewrecords: true,
+                rowNum: 10,
+                rowList: [10, 20, 30],
+                pager: "#requirementPager",
+                multiselect: true,
+                caption: "第一个jqGrid例子"
+
+            }).navGrid('#pager', {edit: true, add: true, del: true});
+
+            jQuery("#requirementTable").jqGrid('setFrozenColumns');
+        });
+
+    </script>
+{% endblock %}
+
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media.js }}
+    {% if action_form %}{% if actions_on_top or actions_on_bottom %}
+        <script type="text/javascript">
+            (function ($) {
+                $(document).ready(function ($) {
+                    $("tr input.action-select").actions();
+                });
+            })(django.jQuery);
+        </script>
+    {% endif %}{% endif %}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+            {#&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ app_label|capfirst|escape }}</a>#}
+            &rsaquo; <a href="/admin/workcenter/">工作中心</a>
+            &rsaquo; 需求管理
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        {% block object-tools %}
+            {% if has_add_permission %}
+                <ul class="object-tools">
+                    {% block object-tools-items %}
+                        <li>
+                            <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}"
+                               class="addlink">
+                                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+                            </a>
+                        </li>
+                    {% endblock %}
+                </ul>
+            {% endif %}
+        {% endblock %}
+        {% if cl.formset.errors %}
+            <p class="errornote">
+                {% blocktrans count cl.formset.errors|length as counter %}Please correct the error below.{% plural %}
+                    Please correct the errors below.{% endblocktrans %}
+            </p>
+            {{ cl.formset.non_form_errors }}
+        {% endif %}
+        <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+            {#      {% block search %}{% search_form cl %}{% endblock %}#}
+            {#      {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}#}
+
+            {% block filters %}
+                {% if cl.has_filters %}
+                    <div id="changelist-filter">
+                        <h2>{% trans 'Filter' %}</h2>
+                        {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+                    </div>
+                {% endif %}
+            {% endblock %}
+
+            <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                {% csrf_token %}
+                {% if cl.formset %}
+                    <div>{{ cl.formset.management_form }}</div>
+                {% endif %}
+
+                <div class="results">
+
+                    <div id="requirementQuery">
+                        <div id="query">
+                            <label>编号：</label><input type="text" class="input" id="sn"/>
+                            <label>名称：</label><input type="text" class="input" id="title"/>
+                            <input type="submit" class="btn" id="find_btn" value="查 询"/>
+                        </div>
+                        <input type="button" class="btn" id="add_btn" value="新 增"/>
+                        <input type="button" class="btn" id="del_btn" value="删 除"/>
+                    </div>
+
+                    <table id="requirementTable"></table>
+                    <div id="requirementPager"></div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

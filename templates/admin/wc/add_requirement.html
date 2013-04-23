@@ -1,0 +1,53 @@
+{% extends "admin/base_pop.html" %}
+{% load i18n admin_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <script src="{% static "admin/js/wc/requirement.js" %}" type="text/javascript"></script>
+{% endblock extrastyle %}
+
+{% block content %}
+
+    <div class="fanbox">
+        <h3>新增需求</h3>
+        <form id="add_form" action="/admin/workcenter/add_requirement/" method="post">
+            {% csrf_token %}
+            <div class="field">
+                {{ form.requirement_name.errors }}
+                <label for="id_requirement_name">{{ form.requirement_name.label }}: </label>
+                {{ form.requirement_name }}
+                <br>
+
+                {{ form.requirement_type.errors }}
+                <label for="id_requirement_type">{{ form.requirement_type.label }}: </label>
+                {{ form.requirement_type }}
+                <br>
+
+                {{ form.requirement_dept.errors }}
+                <label for="id_requirement_dept">{{ form.requirement_dept.label }}:</label>
+                {{ form.requirement_dept }}
+                <br>
+
+                {{ form.submitter_user.errors }}
+                <label for="id_submitter_user">{{ form.submitter_user.label }}: </label>
+                {{ form.submitter_user }}
+                <br>
+
+                {{ form.gmt_hope_finished.errors }}
+                <label for="id_gmt_hope_finished">{{ form.gmt_hope_finished.label }}:</label>
+                {{ form.gmt_hope_finished }}
+                <br>
+
+                {{ form.requirement_desc.errors }}
+                <label for="id_requirement_desc">{{ form.requirement_desc.label }}:</label>
+                {{ form.requirement_desc }}
+                <br>
+
+            </div>
+
+            <input type="submit" class="btn" value="提交"/>
+            <input type="button" class="btn" value="取消" onclick="parent.jQuery.fancybox.close();"  />
+        </form>
+    </div>
+
+{% endblock %}

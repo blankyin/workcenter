@@ -1,0 +1,20 @@
+{% extends "admin/base_pop.html" %}
+
+{% block content %}
+
+    <div class="fanbox">
+        <h3>新增产品</h3>
+        <form id="add_form" action="/admin/workcenter/add_foo/" method="post">
+            {% csrf_token %}
+            <div class="field">
+                {{ form.name.errors }}
+                <label for="id_name">Name: </label>
+                {{ form.name }}
+            </div>
+
+            <input type="submit" class="btn" value="提交"/>
+            <input type="button" class="btn" value="取消" onclick="parent.jQuery.fancybox.close();"  />
+        </form>
+    </div>
+
+{% endblock %}
