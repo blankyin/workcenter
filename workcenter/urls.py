@@ -35,7 +35,12 @@ urlpatterns = patterns('',
 
     url(r'admin/workcenter/requirement_list/', views.requirement_list),
     url(r'^admin/workcenter/add_requirement/', views.add_requirement),
+    url(r'^admin/workcenter/update_requirement/', views.update_requirement),
+    url(r'^admin/workcenter/del_requirement/', views.del_requirement),
     url(r'^admin/workcenter/requirement_detail/(\d+)/', views.requirement_detail),
+    url(r'^admin/workcenter/requirement_type_list/', views.requirement_type_list),
+    url(r'^admin/workcenter/requirement_dept_list/', views.requirement_dept_list),
+    url(r'^admin/workcenter/user_list/', views.user_list),
 
 
 )

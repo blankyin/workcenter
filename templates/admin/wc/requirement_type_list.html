@@ -1,0 +1,9 @@
+{#需求类目下拉框#}
+<select>
+    <option value="">ALL</option>
+    {% if result %}
+        {% for type in result %}
+            <option value="{{ type.code }}">{{ type.value }}</option>
+        {% endfor %}
+    {% endif %}
+</select>

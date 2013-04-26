@@ -1,0 +1,9 @@
+{#需求部门下拉框#}
+<select>
+    <option value="">ALL</option>
+    {% if result %}
+        {% for dept in result %}
+            <option value="{{ dept.id }}">{{ dept.name }}</option>
+        {% endfor %}
+    {% endif %}
+</select>

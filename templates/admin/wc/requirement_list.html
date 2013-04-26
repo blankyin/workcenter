@@ -27,49 +27,8 @@
     {# 由于需要读取变量值，未放入requirement.js中 #}
     <script>
         $(document).ready(function () {
-            $("#requirementTable").jqGrid({
-                mtype: "POST",
-                url: "/admin/workcenter/requirement_list/",
-                datatype: "json",
-                height: 250,
-        //        width: 'auto',
-                autowidth:true,
-                rownumbers:true,
-                colNames: ['操作', '需求状态', '需求单号', '需求名称', '需求类别', '需求部门', '需求描述'
-                    , '期望完成日期', '需求提出人', '需求提出时间'],
-                colModel: [
-                    {name: 'id', index: 'id', width: 100, frozen:true,
-                        formatter:function (cellvalue, options, rowObject){
-                            opration = '<a onclick="requirement_detail(' + cellvalue + ')">详情</a>'
-                            return opration
-                        }
-                    },
-                    {name: 'status', index: 'status', width: 100, frozen:true },
-                    {name: 'requirement_code', index: 'requirement_code', width: 100},
-                    {name: 'requirement_name', index: 'requirement_name', width: 100},
-                    {name: 'requirement_type_name', index: 'requirement_type', width: 100},
-                    {name: 'requirement_dept_name', index: 'requirement_dept', width: 100},
-                    {name: 'requirement_desc', index: 'requirement_desc', width: 100},
-                    {name: 'gmt_hope_finished', index: 'gmt_hope_finished', width: 150,
-                        formatter:"date",formatoptions: {srcformat:'Y-m-d H:i:s',newformat:'Y-m-d'}},
-                    {name: 'submitter_user_name', index: 'submitter_user_name', width: 100},
-                    {name: 'gmt_submit', index: 'gmt_submit', width: 150}
 
-                ],
-                sortname: 'gmt_submit',
-                sortorder: 'desc',
-                viewrecords: true,
-                rowNum: 10,
-                rowList: [10, 20, 30],
-                pager: "#requirementPager",
-                multiselect: true,
-                caption: "第一个jqGrid例子"
-
-            }).navGrid('#pager', {edit: true, add: true, del: true});
-
-            jQuery("#requirementTable").jqGrid('setFrozenColumns');
         });
-
     </script>
 {% endblock %}
 
@@ -139,30 +98,25 @@
                 {% endif %}
             {% endblock %}
 
-            <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>
-                {% csrf_token %}
-                {% if cl.formset %}
-                    <div>{{ cl.formset.management_form }}</div>
-                {% endif %}
-
-                <div class="results">
-
-                    <div id="requirementQuery">
-                        <div id="query">
-                            <label>编号：</label><input type="text" class="input" id="sn"/>
-                            <label>名称：</label><input type="text" class="input" id="title"/>
-                            <input type="submit" class="btn" id="find_btn" value="查 询"/>
-                        </div>
-                        <input type="button" class="btn" id="add_btn" value="新 增"/>
-                        <input type="button" class="btn" id="del_btn" value="删 除"/>
+            <div class="results">
+                <div id="requirementQuery">
+                    <div id="query">
+                        <label>需求名称：</label><input type="text" onkeydown="doSearch(arguments[0]||event)" class="input" id="search_requirement_name"/>
+                        <label>需求类别：</label><input type="text" onkeydown="doSearch(arguments[0]||event)" class="input" id="search_requirement_type"/>
+                        <button onclick="gridReload()" id="submitButton" style="margin-left:30px;">查 询</button>
+                        <input type="checkbox" id="autosearch" onclick="enableAutosubmit(this.checked)" style="margin-left:30px;">自动查询
                     </div>
 
-                    <table id="requirementTable"></table>
-                    <div id="requirementPager"></div>
-
+                    <input type="button" class="btn" id="add_btn" value="新 增"/>
+                    <input type="button" class="btn" id="del_btn" value="删 除"/>
                 </div>
 
-            </form>
+                <div style="padding: 5px 5px 5px 5px">
+                    <table id="requirementTable"></table>
+                    <div id="requirementPager"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock %}

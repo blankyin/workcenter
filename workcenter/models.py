@@ -124,16 +124,6 @@ class Requirement(models.Model):
             return settings.TEMPLATE_STRING_IF_INVALID
         return type.value
 
-    def _get_submitter_user_name(self):
-        """
-        获取提交人姓名
-        """
-        try:
-            user = User.objects.get(id=self.submitter_user)
-        except:
-            return settings.TEMPLATE_STRING_IF_INVALID
-        return user.username
-
     def _get_requirement_dept_name(self):
         """
         获取部门名称
@@ -144,6 +134,27 @@ class Requirement(models.Model):
             return settings.TEMPLATE_STRING_IF_INVALID
         return dept.name
 
+    def _get_submitter_user_name(self):
+        """
+        获取提交人姓名
+        """
+        try:
+            user = User.objects.get(id=self.submitter_user)
+        except:
+            return settings.TEMPLATE_STRING_IF_INVALID
+        return user.username
+
+    def _get_modifier_user_name(self):
+        """
+        获取修改人姓名
+        """
+        try:
+            user = User.objects.get(id=self.modifier_user)
+        except:
+            return settings.TEMPLATE_STRING_IF_INVALID
+        return user.username
+
     requirement_type_name = property(_get_requirement_type_name)
-    submitter_user_name = property(_get_submitter_user_name)
     requirement_dept_name = property(_get_requirement_dept_name)
+    submitter_user_name = property(_get_submitter_user_name)
+    modifier_user_name = property(_get_modifier_user_name)

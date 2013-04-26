@@ -1,0 +1,9 @@
+{#有效用户下拉框#}
+<select>
+    <option value="">ALL</option>
+    {% if result %}
+        {% for user in result %}
+            <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    {% endif %}
+</select>
